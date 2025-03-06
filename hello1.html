@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Live Location Map</title>
+  <!-- Mapbox CSS -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.css" rel="stylesheet" />
+  <!-- Mapbox Directions CSS (optional) -->
+  <link href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.css" rel="stylesheet" type="text/css" />
+  <style>
+    /* Basic reset */
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    /* Map container fills the viewport */
+    #map {
+      width: 100vw;
+      height: 100vh;
+    }
+  </style>
+  <!-- Mapbox JS and Directions JS -->
+  <script src="https://api.mapbox.com/mapbox-gl-js/v1.12.0/mapbox-gl.js"></script>
+  <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.0/mapbox-gl-directions.js"></script>
+  <script defer>
+    // Set your Mapbox access token (replace with your own token if needed)
+    mapboxgl.accessToken = "pk.eyJ1Ijoic3ViaGFtcHJlZXQiLCJhIjoiY2toY2IwejF1MDdodzJxbWRuZHAweDV6aiJ9.Ys8MP5kVTk5P9V2TDvnuDg";
+
+    // Use the Geolocation API to get the user's current position
+    navigator.geolocation.getCurrentPosition(successLocation, errorLocation, {
+      enableHighAccuracy: true
+    });
+
+    // If location is successfully retrieved, call setupMap() with the coordinates
+    function successLocation(position) {
+      const userCoordinates = [position.coords.longitude, position.coords.latitude];
+      setupMap(userCoordinates);
+    }
+
+    // If there is an error (or if the user denies permission), use a default location
+    function errorLocation() {
+      setupMap([-2.24, 53.48]); // Default: somewhere in the UK (change as desired)
+    }
+
+    // Function to initialize the map
+    function setupMap(center) {
+      // Create a new map instance
+      const map = new mapboxgl.Map({
+        container: "map",
+        style: "mapbox://styles/mapbox/streets-v11",
+        center: center,
+        zoom: 15
+      });
+      
+      // Add navigation control (zoom and rotate buttons)
+      map.addControl(new mapboxgl.NavigationControl());
+
+      // Optionally, add the directions control (to get route information)
+      const directions = new MapboxDirections({
+        accessToken: mapboxgl.accessToken,
+        unit: "metric",
+        profile: "mapbox/driving"
+      });
+      map.addControl(directions, "top-left");
+
+      // Add a marker at the user's location
+      new mapboxgl.Marker()
+        .setLngLat(center)
+        .addTo(map)
+        .setPopup(new mapboxgl.Popup({ offset: 25 }).setText("You are here!"))
+        .togglePopup();
+    }
+  </script>
+</head>
+<body>
+  <div id="map"></div>
+</body>
+</html>
