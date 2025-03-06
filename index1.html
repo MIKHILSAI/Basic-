@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Parker Dashboard</title>
+  <style>
+    /* Global Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease;
+      position: relative;
+      padding: 20px;
+    }
+    /* Side Menu */
+    .side-menu {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 200px;
+      height: 100vh;
+      background: #333;
+      color: #fff;
+      padding: 20px 10px;
+      transform: translateX(-200px);
+      transition: transform 0.5s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .close-menu {
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      align-self: flex-end;
+    }
+    .menu-option {
+      background: #555;
+      border: none;
+      color: #fff;
+      padding: 10px 15px;
+      width: 90%;
+      cursor: pointer;
+      border-radius: 5px;
+      text-align: left;
+    }
+    .menu-option:hover {
+      background: #666;
+    }
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 15px;
+      transition: transform 0.5s ease;
+    }
+    header h2 {
+      font-size: 20px;
+    }
+    .hamburger-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: inline-block;
+      width: 30px;
+      height: 22px;
+      position: relative;
+    }
+    .bar {
+      display: block;
+      width: 100%;
+      height: 3px;
+      background-color: #000;
+      margin-bottom: 5px;
+      transition: 0.3s;
+    }
+    /* Search Bar */
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 10px auto;
+      max-width: 600px;
+      padding: 0 15px;
+      transition: transform 0.5s ease;
+    }
+    .search-bar input {
+      flex: 1;
+      padding: 8px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    .search-bar button {
+      padding: 8px 12px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    /* Parking Options (Dashboard) */
+    .parking-options {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 15px;
+      transition: transform 0.5s ease;
+    }
+    .parking-card {
+      background: #fff;
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      width: 160px;
+      text-align: center;
+      padding: 15px;
+      cursor: pointer;
+      transition: 0.3s;
+      outline: none;
+    }
+    .parking-card:hover {
+      transform: translateY(-5px);
+    }
+    .parking-card h3 {
+      margin: 10px 0 5px;
+    }
+    .parking-card p {
+      font-size: 14px;
+      color: #555;
+    }
+    .icon {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-bottom: 8px;
+    }
+    .red   { background: red; }
+    .blue  { background: blue; }
+    .green { background: green; }
+    /* Slide-Out Menu Animation */
+    body.menu-open .side-menu {
+      transform: translateX(0);
+    }
+    body.menu-open header,
+    body.menu-open .search-bar,
+    body.menu-open .parking-options {
+      transform: translateX(200px);
+    }
+    /* Results Panel on Right */
+    .results-panel {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 400px;
+      height: 100vh;
+      background: #fff;
+      box-shadow: -2px 0 5px rgba(0,0,0,0.3);
+      padding: 20px;
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.5s ease;
+    }
+    .results-panel.active {
+      transform: translateX(0);
+    }
+    .results-panel h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 24px;
+      color: #333;
+    }
+    .results-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .result-card {
+      background: #f0f0f0;
+      border-radius: 8px;
+      padding: 10px;
+      width: 100%;
+      max-width: 350px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      text-align: center;
+      position: relative;
+    }
+    .result-card h3 {
+      margin-bottom: 8px;
+      font-size: 20px;
+      color: #333;
+    }
+    .result-card p {
+      margin-bottom: 5px;
+      font-size: 16px;
+      color: #555;
+    }
+    .button-container {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 10px;
+    }
+    .accept-btn, .reject-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: #fff;
+    }
+    .accept-btn {
+      background: #28a745; /* green */
+    }
+    .accept-btn:hover {
+      background: #218838;
+    }
+    .reject-btn {
+      background: #dc3545; /* red */
+    }
+    .reject-btn:hover {
+      background: #c82333;
+    }
+  </style>
+</head>
+<body>
+  <!-- Side Menu -->
+  <div class="side-menu" id="sideMenu">
+    <button id="closeMenuButton" class="close-menu">×</button>
+    <button class="menu-option">Personal Details</button>
+    <button class="menu-option">Settings</button>
+    <button class="menu-option">Payment History</button>
+    <button class="menu-option">Parking History</button>
+  </div>
+  
+  <!-- Main Content -->
+  <header>
+    <h2>Parker Dashboard</h2>
+    <button id="openMenuButton" class="hamburger-btn">
+      <span class="bar"></span>
+      <span class="bar"></span>
+      <span class="bar"></span>
+    </button>
+  </header>
+  
+  <div class="search-bar">
+    <input type="text" id="destination" placeholder="Enter your destination...">
+    <button id="findParking">Find Parking</button>
+  </div>
+  
+  <div class="parking-options">
+    <button class="parking-card">
+      <span class="icon red"></span>
+      <h3>Home Parking</h3>
+      <p>Secure spaces at landlords' homes</p>
+    </button>
+    <button class="parking-card">
+      <span class="icon blue"></span>
+      <h3>Street Parking</h3>
+      <p>Find nearby street parking spots</p>
+    </button>
+    <button class="parking-card">
+      <span class="icon green"></span>
+      <h3>Basement Parking</h3>
+      <p>Secure basement parking spaces</p>
+    </button>
+  </div>
+  
+  <!-- Results Panel (Right Side) -->
+  <div class="results-panel" id="resultsPanel">
+    <h1>Nearby Parking Options</h1>
+    <div class="results-grid" id="resultsGrid"></div>
+    <button class="back-btn" id="closeResultsBtn" style="margin-top:20px; padding:10px; background:#007bff; color:#fff; border:none; border-radius:5px; cursor:pointer;">Close Results</button>
+  </div>
+  
+  <script>
+    // Side Menu open/close
+    const openMenuButton = document.getElementById("openMenuButton");
+    const closeMenuButton = document.getElementById("closeMenuButton");
+    const sideMenu = document.getElementById("sideMenu");
+    
+    openMenuButton.addEventListener("click", () => {
+      document.body.classList.add("menu-open");
+    });
+    closeMenuButton.addEventListener("click", () => {
+      document.body.classList.remove("menu-open");
+    });
+    
+    // Parking Results
+    const findParkingBtn = document.getElementById("findParking");
+    const destinationInput = document.getElementById("destination");
+    const resultsPanel = document.getElementById("resultsPanel");
+    const resultsGrid = document.getElementById("resultsGrid");
+    const closeResultsBtn = document.getElementById("closeResultsBtn");
+    
+    // Sample data (added phoneNumber & details for next page)
+    const parkingData = [
+      { 
+        id: 1,
+        name: "Central Park Garage", 
+        cost: "₹50/hr", 
+        distance: "0.5 km", 
+        phoneNumber: "9876543210",
+        details: "Well-lit garage near central park." 
+      },
+      { 
+        id: 2,
+        name: "City Mall Parking", 
+        cost: "₹60/hr", 
+        distance: "0.8 km",
+        phoneNumber: "9123456780",
+        details: "Indoor parking at City Mall." 
+      },
+      { 
+        id: 3,
+        name: "Street Parking Zone", 
+        cost: "₹40/hr", 
+        distance: "1.2 km",
+        phoneNumber: "9012345678",
+        details: "Open street parking with meter." 
+      },
+      { 
+        id: 4,
+        name: "Basement Lot", 
+        cost: "₹55/hr", 
+        distance: "1.0 km",
+        phoneNumber: "9998887776",
+        details: "Basement parking under high-security building." 
+      },
+      { 
+        id: 5,
+        name: "Rooftop Parking", 
+        cost: "₹65/hr", 
+        distance: "0.7 km",
+        phoneNumber: "9087654321",
+        details: "Rooftop parking with scenic view." 
+      }
+    ];
+    
+    findParkingBtn.addEventListener("click", function() {
+      const destination = destinationInput.value.trim();
+      if (destination) {
+        // Clear previous results
+        resultsGrid.innerHTML = "";
+        // Create result cards from parkingData
+        parkingData.forEach((parking, index) => {
+          const card = document.createElement("div");
+          card.className = "result-card";
+          card.innerHTML = `
+            <h3>${parking.name}</h3>
+            <p>Cost: ${parking.cost}</p>
+            <p>Distance: ${parking.distance}</p>
+            <div class="button-container">
+              <button class="accept-btn" onclick="acceptParking(${index})">Accept</button>
+              <button class="reject-btn" onclick="rejectParking(${index})">Reject</button>
+            </div>
+          `;
+          resultsGrid.appendChild(card);
+        });
+        // Show the results panel
+        resultsPanel.classList.add("active");
+      } else {
+        alert("Please enter a destination.");
+      }
+    });
+    
+    // Close the results panel
+    closeResultsBtn.addEventListener("click", () => {
+      resultsPanel.classList.remove("active");
+    });
+    
+    // Accept Parking => navigate to new page with full details
+    function acceptParking(index) {
+      const chosen = parkingData[index];
+      // Build a query string with the ID or all details
+      const urlParams = new URLSearchParams({
+        id: chosen.id,
+        name: chosen.name,
+        cost: chosen.cost,
+        distance: chosen.distance,
+        phone: chosen.phoneNumber,
+        details: chosen.details
+      });
+      // Navigate to parking-details.html
+      window.location.href = "parking-details.html?" + urlParams.toString();
+    }
+    
+    // Reject => remove the card from the list
+    function rejectParking(index) {
+      // Remove from the data array (optional)
+      parkingData.splice(index, 1);
+      // Re-render the results
+      resultsGrid.innerHTML = "";
+      parkingData.forEach((parking, newIndex) => {
+        const card = document.createElement("div");
+        card.className = "result-card";
+        card.innerHTML = `
+          <h3>${parking.name}</h3>
+          <p>Cost: ${parking.cost}</p>
+          <p>Distance: ${parking.distance}</p>
+          <div class="button-container">
+            <button class="accept-btn" onclick="acceptParking(${newIndex})">Accept</button>
+            <button class="reject-btn" onclick="rejectParking(${newIndex})">Reject</button>
+          </div>
+        `;
+        resultsGrid.appendChild(card);
+      });
+    }
+    
+    // If you use PIN boxes, here's a function to auto-advance:
+    function moveNext(current, nextIndex) {
+      if (current.value.length === 1) {
+        const boxes = document.querySelectorAll(".pin-box");
+        if (boxes[nextIndex]) {
+          boxes[nextIndex].focus();
+        }
+      }
+    }
+  </script>
+</body>
+</html>

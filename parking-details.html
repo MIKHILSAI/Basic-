@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Parking Details</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f8f9fa;
+      margin: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    p {
+      margin-bottom: 8px;
+      color: #555;
+      font-size: 16px;
+    }
+    .pay-btn {
+      display: block;
+      margin: 20px auto 0;
+      padding: 10px 20px;
+      background: #28a745;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .pay-btn:hover {
+      background: #218838;
+    }
+    .success-message {
+      margin-top: 20px;
+      text-align: center;
+      color: green;
+      font-size: 18px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 id="parkingName">Parking Details</h1>
+    <p id="parkingCost"></p>
+    <p id="parkingDistance"></p>
+    <p id="parkingPhone"></p>
+    <p id="parkingExtra"></p>
+    
+    <!-- Pay Button -->
+    <button class="pay-btn" id="payBtn">Pay</button>
+    <div class="success-message" id="successMsg">Success!</div>
+  </div>
+  
+  <script>
+    // Parse query parameters
+    const params = new URLSearchParams(window.location.search);
+    const name = params.get("name");
+    const cost = params.get("cost");
+    const distance = params.get("distance");
+    const phone = params.get("phone");
+    const details = params.get("details");
+    
+    // Populate the DOM
+    document.getElementById("parkingName").textContent = name || "Parking Details";
+    document.getElementById("parkingCost").textContent = cost ? `Cost: ${cost}` : "";
+    document.getElementById("parkingDistance").textContent = distance ? `Distance: ${distance}` : "";
+    document.getElementById("parkingPhone").textContent = phone ? `Phone: ${phone}` : "";
+    document.getElementById("parkingExtra").textContent = details ? `Details: ${details}` : "";
+    
+    // On Pay button click, show success message
+    document.getElementById("payBtn").addEventListener("click", () => {
+      document.getElementById("successMsg").style.display = "block";
+    });
+  </script>
+</body>
+</html>
